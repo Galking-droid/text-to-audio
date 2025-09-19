@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lector de Texto a Audio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Convierte tu texto a audio</h1>
+        <form action="/convertir" method="post" enctype="multipart/form-data" onsubmit="showLoader()">
+            <label for="lang">Selecciona un idioma:</label>
+            <select name="lang" id="lang">
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
+                <option value="fr">Francés</option>
+                <option value="de">Alemán</option>
+            </select>
+            <label for="file">Sube un archivo de texto (.txt, .docx, .pdf):</label>
+            <input type="file" name="file" id="file" accept=".txt, .docx, .pdf" required />
+            <input type="submit" value="Convertir a audio" />
+        </form>
+        <div class="loader" id="loader"></div>
+    </div>
+
+    <script>
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+Resumen del Proyecto y Mejoras Futuras
+
+## Progreso Actual
+
+1.  **Funcionalidad Básica:** La aplicación convierte texto de archivos (.txt, .docx, .pdf) a audio MP3.
+2.  **Gestión de Dependencias:** Se ha creado un archivo `requirements.txt` para facilitar la instalación de las dependencias del proyecto.
+3.  **Interfaz de Usuario Mejorada:** La interfaz de usuario ha sido rediseñada con CSS para un aspecto más moderno y atractivo. Se ha añadido un indicador de carga para mejorar la experiencia del usuario.
+4.  **Selección de Idioma:** Se ha añadido una opción para que el usuario pueda seleccionar el idioma del audio (Español, Inglés, Francés, Alemán).
+
+## Posibles Mejoras Futuras
+
+### Mejoras de Funcionalidad
+
+*   **Entrada de texto directa:** Permitir a los usuarios pegar texto directamente en un área de texto en la página web.
+*   **Soporte para más formatos de archivo:** Añadir soporte para otros formatos de archivo como .odt, .rtf, etc.
+*   **Selección de formato de audio:** Permitir a los usuarios elegir el formato de salida del audio (por ejemplo, .wav, .ogg).
+*   **Selección de voz:** Ofrecer diferentes voces (masculina, femenina) para la conversión de texto a voz.
+
+### Mejoras Técnicas
+
+*   **Manejo de errores robusto:** Implementar un manejo de errores más completo para casos como fallos en la conversión de gTTS o archivos corruptos.
+*   **Procesamiento asíncrono:** Utilizar una cola de tareas (como Celery) para procesar archivos grandes en segundo plano y evitar que el navegador se quede esperando.
+*   **Pruebas unitarias:** Escribir pruebas para asegurar la fiabilidad del código.
+*   **Contenerización:** Crear un `Dockerfile` para facilitar el despliegue de la aplicación.
+*   **Servidor de producción:** Configurar la aplicación para que se ejecute con un servidor WSGI de producción (como Gunicorn).
