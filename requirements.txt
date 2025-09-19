@@ -2,3 +2,5 @@ Flask
 gTTS
 python-docx
 PyPDF2
+ezodf
+striprtf

@@ -16,8 +16,24 @@
                 <option value="fr">Francés</option>
                 <option value="de">Alemán</option>
             </select>
-            <label for="file">Sube un archivo de texto (.txt, .docx, .pdf):</label>
-            <input type="file" name="file" id="file" accept=".txt, .docx, .pdf" required />
+
+            <div class="input-method">
+                <input type="radio" id="text-input-method" name="input_method" value="text" checked>
+                <label for="text-input-method">Escribir texto</label>
+                <input type="radio" id="file-input-method" name="input_method" value="file">
+                <label for="file-input-method">Subir archivo</label>
+            </div>
+
+            <div id="text-input-container">
+                <label for="text_input">Escribe o pega tu texto aquí:</label>
+                <textarea name="text_input" id="text_input" rows="10" cols="50"></textarea>
+            </div>
+
+            <div id="file-input-container" style="display: none;">
+                <label for="file">Sube un archivo de texto (.txt, .docx, .pdf, .odt, .rtf):</label>
+                <input type="file" name="file" id="file" accept=".txt, .docx, .pdf, .odt, .rtf" />
+            </div>
+
             <input type="submit" value="Convertir a audio" />
         </form>
         <div class="loader" id="loader"></div>
@@ -27,6 +43,35 @@
         function showLoader() {
             document.getElementById('loader').style.display = 'block';
         }
+
+        const textInputMethod = document.getElementById('text-input-method');
+        const fileInputMethod = document.getElementById('file-input-method');
+        const textInputContainer = document.getElementById('text-input-container');
+        const fileInputContainer = document.getElementById('file-input-container');
+        const textInput = document.getElementById('text_input');
+        const fileInput = document.getElementById('file');
+
+        textInputMethod.addEventListener('change', () => {
+            if (textInputMethod.checked) {
+                textInputContainer.style.display = 'block';
+                fileInputContainer.style.display = 'none';
+                textInput.required = true;
+                fileInput.required = false;
+            }
+        });
+
+        fileInputMethod.addEventListener('change', () => {
+            if (fileInputMethod.checked) {
+                textInputContainer.style.display = 'none';
+                fileInputContainer.style.display = 'block';
+                textInput.required = false;
+                fileInput.required = true;
+            }
+        });
+
+        // Set initial state
+        textInput.required = true;
+        fileInput.required = false;
     </script>
 </body>
 </html>
