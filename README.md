@@ -1,11 +1,11 @@
 # Text to Audio Converter
 
-Herramienta web simple creada con Python (Flask) y gTTS para convertir texto de documentos a voz. Soporta archivos .txt, .docx, .pdf, .odt y .rtf.
+Herramienta web simple creada con Python (Flask) y pyttsx3 para convertir texto de documentos a voz, con selección de voces del sistema. Soporta archivos .txt, .docx, .pdf, .odt y .rtf.
 
 ## Características
 
 *   Convierte texto desde archivos `.txt`, `.docx`, `.pdf`, `.odt` y `.rtf` a audio.
-*   Permite seleccionar el idioma del audio (Español, Inglés, Francés, Alemán).
+*   Permite seleccionar la voz de entre las instaladas en el sistema.
 *   Descarga el audio generado en formato MP3.
 *   Interfaz de usuario limpia y fácil de usar.
 
@@ -15,7 +15,7 @@ Herramienta web simple creada con Python (Flask) y gTTS para convertir texto de 
     *   Python
     *   Flask
 *   **Conversión de Texto a Voz:**
-    *   gTTS (Google Text-to-Speech)
+    *   `pyttsx3`
 *   **Lectura de Archivos:**
     *   `python-docx` para archivos .docx
     *   `PyPDF2` para archivos .pdf

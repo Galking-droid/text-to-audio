@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, send_file
-from gtts import gTTS
+from flask import Flask, render_template, request, send_file, after_this_request
+import pyttsx3
 import os
-import io
+import uuid  # To generate unique filenames
 
 # Importar las librerías para manejar archivos
 import docx
@@ -17,12 +17,23 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Ruta principal que sirve el formulario HTML
+def get_available_voices():
+    """Gets a list of available voices from pyttsx3."""
+    try:
+        engine = pyttsx3.init()
+        voices = engine.getProperty('voices')
+        engine.stop()
+        return [{'id': voice.id, 'name': voice.name} for voice in voices]
+    except Exception as e:
+        print(f"Could not initialize pyttsx3: {e}")
+        return []
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    """Renders the main page with the list of available voices."""
+    voices = get_available_voices()
+    return render_template('index.html', voices=voices)
 
-# Función para leer el texto de un archivo
 def get_text_from_file(file_path):
     text = ""
     file_extension = os.path.splitext(file_path)[1].lower()
@@ -30,12 +41,10 @@ def get_text_from_file(file_path):
     if file_extension == '.txt':
         with open(file_path, 'r', encoding='utf-8') as f:
             text = f.read()
-
     elif file_extension == '.docx':
         doc = docx.Document(file_path)
         for para in doc.paragraphs:
             text += para.text + "\n"
-
     elif file_extension == '.pdf':
         try:
             with open(file_path, 'rb') as f:
@@ -44,20 +53,17 @@ def get_text_from_file(file_path):
                     text += page.extract_text()
         except Exception as e:
             print(f"Error al leer el archivo PDF: {e}")
-            text = "" # En caso de error, el texto queda vacío
-            
+            text = ""
     elif file_extension == '.odt':
         try:
             doc = ezodf.opendoc(file_path)
             text = ""
-            # extract text from paragraphs
             for p in doc.body:
                 if isinstance(p, ezodf.text.Paragraph):
                     text += p.plaintext()
         except Exception as e:
             print(f"Error al leer el archivo ODT: {e}")
             text = ""
-
     elif file_extension == '.rtf':
         try:
             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
@@ -66,14 +72,12 @@ def get_text_from_file(file_path):
         except Exception as e:
             print(f"Error al leer el archivo RTF: {e}")
             text = ""
-
     return text
 
-# Ruta que procesa el archivo subido
 @app.route('/convertir', methods=['POST'])
 def convertir_a_audio():
-    lang = request.form.get('lang', 'es')
     input_method = request.form.get('input_method')
+    voice_id = request.form.get('voice')
     texto_extraido = ""
 
     if input_method == 'text':
@@ -81,11 +85,9 @@ def convertir_a_audio():
     elif input_method == 'file':
         if 'file' not in request.files:
             return "No se encontró el archivo.", 400
-
         file = request.files['file']
         if file.filename == '':
             return "No se seleccionó ningún archivo.", 400
-
         if file:
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(file_path)
@@ -93,20 +95,38 @@ def convertir_a_audio():
             os.remove(file_path)
 
     if texto_extraido and texto_extraido.strip():
-        tts = gTTS(text=texto_extraido, lang=lang)
-        audio_buffer = io.BytesIO()
-        tts.write_to_fp(audio_buffer)
-        audio_buffer.seek(0)
+        try:
+            engine = pyttsx3.init()
+            
+            if voice_id:
+                engine.setProperty('voice', voice_id)
 
-        return send_file(
-            audio_buffer,
-            mimetype='audio/mp3',
-            as_attachment=True,
-            download_name="audio_generado.mp3"
-        )
+            temp_audio_filename = f"{uuid.uuid4()}.mp3"
+            temp_audio_path = os.path.join(app.config['UPLOAD_FOLDER'], temp_audio_filename)
+
+            engine.save_to_file(texto_extraido, temp_audio_path)
+            engine.runAndWait()
+            engine.stop()
+
+            @after_this_request
+            def cleanup(response):
+                try:
+                    os.remove(temp_audio_path)
+                except Exception as e:
+                    print(f"Error removing temporary audio file: {e}")
+                return response
+
+            return send_file(
+                temp_audio_path,
+                mimetype='audio/mp3',
+                as_attachment=True,
+                download_name="audio_generado.mp3"
+            )
+        except Exception as e:
+            print(f"Error during audio generation: {e}")
+            return "Ocurrió un error al generar el audio.", 500
     else:
         return "No se proporcionó texto o no se pudo extraer texto del archivo.", 400
 
-# Asegurarse de que el servidor se ejecute solo si se llama a este script
 if __name__ == '__main__':
     app.run(debug=True)

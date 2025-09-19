@@ -9,12 +9,11 @@
     <div class="container">
         <h1>Convierte tu texto a audio</h1>
         <form action="/convertir" method="post" enctype="multipart/form-data" onsubmit="showLoader()">
-            <label for="lang">Selecciona un idioma:</label>
-            <select name="lang" id="lang">
-                <option value="es">Español</option>
-                <option value="en">Inglés</option>
-                <option value="fr">Francés</option>
-                <option value="de">Alemán</option>
+            <label for="voice">Selecciona una voz:</label>
+            <select name="voice" id="voice">
+                {% for voice in voices %}
+                    <option value="{{ voice.id }}">{{ voice.name }}</option>
+                {% endfor %}
             </select>
 
             <div class="input-method">
